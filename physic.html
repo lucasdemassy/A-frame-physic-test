@@ -1,0 +1,81 @@
+<!doctype HTML>
+<html lang="en" dir="ltr">
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<head>
+  <meta charset="utf-8">
+  <title>A-Frame Physic Scene</title>
+  <script src="js/aframe.min.js"></script>
+  <script src="js/aframe-ar.js"></script>
+  <script src="js/aframe-physics-components.js"></script>
+</head>
+
+<body style="margin: 0px; overflow: hidden;">
+
+<script>
+
+// store visibility data in object;
+//  can only draw line when both are visible.
+let markerVisible = { m0: false };
+
+AFRAME.registerComponent('registerevents', {
+    init: function ()
+    {
+        let marker = this.el;
+
+        marker.addEventListener('markerFound', function() {
+            markerVisible[ marker.id ] = true;
+        });
+
+        marker.addEventListener('markerLost', function() {
+            markerVisible[ marker.id ] = false;
+        });
+        this.m0 = document.querySelector("#m0");
+        this.scene = document.querySelector('a-scene');
+        this.camera = document.querySelector('#camera');
+        this.ground = document.querySelector('#ground');
+        this.boite = document.querySelector('#boite');
+    },
+    tick: function (time, deltaTime)
+    {
+      if ( markerVisible["m0"] )
+      {
+        this.ground.setAttribute('position', {x:1, y:0, z:0});
+      }
+    }
+});
+
+
+
+</script>
+
+
+<a-scene embedded vr-mode-ui="enabled: false;" arjs="detectionMode: mono_and_matrix; matrixCodeType: 3x3;" physics-world="gravity: 0 -0.5 0"  physics="debug:true">
+
+  <a-assets>
+    <a-mixin id="box"
+     geometry="primitive: box; width: 0.1; height: 0.1; depth: 0.1"
+     material="color: #166678"
+     physics-body="mass: 0.1; boundingBox: 0.1 0.1 0.1; shape:hull"></a-mixin>
+    <a-sphere radius="0.10" color="red" position="0 1 0" physics-body="mass: 1 velocity: 0 0 0"></a-sphere>
+  </a-assets>
+
+
+
+  <a-marker type="barcode" value="3" id="m0" registerevents>
+    <a-entity mixin="box" id='boite' position="0 10 0"></a-entity>
+
+    <a-entity id="ground"
+                  geometry="primitive: box; depth: 2; height: 0.5; width: 2"
+                  material="color: #2E3837"
+                  physics-body="mass: 0; boundingBox: 2 0.5 2; shape:hull"
+                  ></a-entity>
+  </a-marker>
+
+  <a-entity camera id="camera"></a-entity>
+
+</a-scene>
+
+
+
+</body>
+</html>
